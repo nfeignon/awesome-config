@@ -251,57 +251,60 @@ batwidget = lain.widgets.bat({
     end
 })
 
--- ALSA volume bar
-myvolumebar = lain.widgets.alsabar({
-    card   = "0",
-    ticks  = true,
-    width  = 80,
-    height = 10,
-    colors = {
-        background = "#383838",
-        unmute     = "#80CCE6",
-        mute       = "#FF9F9F"
-    },
-    notifications = {
-        font      = "Tamsyn",
-        font_size = "12",
-        bar_size  = 32
-    }
-})
-alsamargin = wibox.layout.margin(myvolumebar.bar, 5, 8, 80)
-wibox.layout.margin.set_top(alsamargin, 12)
-wibox.layout.margin.set_bottom(alsamargin, 12)
-volumewidget = wibox.widget.background()
-volumewidget:set_widget(alsamargin)
-volumewidget:set_bgimage(beautiful.widget_bg)
+-- -- ALSA volume bar
+-- myvolumebar = lain.widgets.alsabar({
+--     card   = "0",
+--     ticks  = true,
+--     width  = 80,
+--     height = 10,
+--     colors = {
+--         background = "#383838",
+--         unmute     = "#80CCE6",
+--         mute       = "#FF9F9F"
+--     },
+--     notifications = {
+--         font      = "Tamsyn",
+--         font_size = "12",
+--         bar_size  = 32
+--     }
+-- })
+-- alsamargin = wibox.layout.margin(myvolumebar.bar, 5, 8, 80)
+-- wibox.layout.margin.set_top(alsamargin, 12)
+-- wibox.layout.margin.set_bottom(alsamargin, 12)
+-- volumewidget = wibox.widget.background()
+-- volumewidget:set_widget(alsamargin)
+-- volumewidget:set_bgimage(beautiful.widget_bg)
+
+-- Pulse wiget
+volumewidget = lain.widgets.pulseaudio()
 
 -- CPU
-cpu_widget = lain.widgets.cpu({
-    settings = function()
-        widget:set_markup(space3 .. "CPU " .. cpu_now.usage
-                          .. "%" .. markup.font("Tamsyn 5", " "))
-    end
-})
-cpuwidget = wibox.widget.background()
-cpuwidget:set_widget(cpu_widget)
-cpuwidget:set_bgimage(beautiful.widget_bg)
-cpu_icon = wibox.widget.imagebox()
-cpu_icon:set_image(beautiful.cpu)
+-- cpu_widget = lain.widgets.cpu({
+--     settings = function()
+--         widget:set_markup(space3 .. "CPU " .. cpu_now.usage
+--                           .. "%" .. markup.font("Tamsyn 5", " "))
+--     end
+-- })
+-- cpuwidget = wibox.widget.background()
+-- cpuwidget:set_widget(cpu_widget)
+-- cpuwidget:set_bgimage(beautiful.widget_bg)
+-- cpu_icon = wibox.widget.imagebox()
+-- cpu_icon:set_image(beautiful.cpu)
 
 -- Net
-netdown_icon = wibox.widget.imagebox()
-netdown_icon:set_image(beautiful.net_down)
-netup_icon = wibox.widget.imagebox()
-netup_icon:set_image(beautiful.net_up)
-netwidget = lain.widgets.net({
-    settings = function()
-        widget:set_markup(markup.font("Tamsyn 1", " ") .. net_now.received .. " - "
-                          .. net_now.sent .. space2)
-    end
-})
-networkwidget = wibox.widget.background()
-networkwidget:set_widget(netwidget)
-networkwidget:set_bgimage(beautiful.widget_bg)
+-- netdown_icon = wibox.widget.imagebox()
+-- netdown_icon:set_image(beautiful.net_down)
+-- netup_icon = wibox.widget.imagebox()
+-- netup_icon:set_image(beautiful.net_up)
+-- netwidget = lain.widgets.net({
+--     settings = function()
+--         widget:set_markup(markup.font("Tamsyn 1", " ") .. net_now.received .. " - "
+--                           .. net_now.sent .. space2)
+--     end
+-- })
+-- networkwidget = wibox.widget.background()
+-- networkwidget:set_widget(netwidget)
+-- networkwidget:set_bgimage(beautiful.widget_bg)
 
 -- -- Weather
 -- myweather = lain.widgets.weather({
@@ -421,6 +424,7 @@ for s = 1, screen.count() do
     -- right_layout:add(musicwidget)
     -- right_layout:add(bar)
     -- right_layout:add(spr_very_small)
+    right_layout:add(spr_left)
     right_layout:add(volumewidget)
     right_layout:add(spr_left)
     -- right_layout:add(bottom_bar)
@@ -586,41 +590,36 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
     awful.key({ altkey,           }, "w",      function () myweather.show(7) end),
 
-    -- ALSA volume control
+    -- Pulse volume control
     awful.key({ altkey }, "Up",
         function ()
-            os.execute(string.format("amixer set %s %s+", myvolumebar.channel, myvolumebar.step))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-volume %s +1%%", volumewidget.sink))
+            volumewidget.update()
         end),
     awful.key({ altkey }, "Down",
         function ()
-            os.execute(string.format("amixer set %s %s-", myvolumebar.channel, myvolumebar.step))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-volume %s -1%%", volumewidget.sink))
+            volumewidget.update()
         end),
     awful.key({ altkey }, "m",
         function ()
-            os.execute(string.format("amixer set %s toggle", myvolumebar.channel))
-            myvolumebar.update()
-        end),
-    awful.key({ altkey, "Control" }, "m",
-        function ()
-            os.execute(string.format("amixer set %s 100%%", myvolumebar.channel))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-mute %s toggle", volumewidget.sink))
+            volumewidget.update()
         end),
     awful.key({}, "XF86AudioRaiseVolume",
         function ()
-            os.execute(string.format("amixer set %s %s+", myvolumebar.channel, myvolumebar.step))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-volume %s +1%%", volumewidget.sink))
+            volumewidget.update()
         end),
     awful.key({}, "XF86AudioLowerVolume",
         function ()
-            os.execute(string.format("amixer set %s %s-", myvolumebar.channel, myvolumebar.step))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-volume %s -1%%", volumewidget.sink))
+            volumewidget.update()
         end),
     awful.key({}, "XF86AudioMute",
         function ()
-            os.execute(string.format("amixer set %s toggle", myvolumebar.channel))
-            myvolumebar.update()
+            os.execute(string.format("pactl set-sink-mute %s toggle", volumewidget.sink))
+            volumewidget.update()
         end),
 
     -- MPD control

@@ -27,8 +27,7 @@ local function worker(args)
 
     function abase.update()
         async.request(cmd, function(f)
-            output = f:read("*a")
-            f:close()
+            output = f
             widget = abase.widget
             settings()
         end)

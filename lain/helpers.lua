@@ -10,8 +10,10 @@ local debug  = require("debug")
 
 local capi   = { timer = timer }
 local io     = { open  = io.open,
-                 lines = io.lines }
+                 lines = io.lines,
+                 popen = io.popen }
 local rawget = rawget
+local table  = { sort   = table.sort }
 
 -- Lain helper functions for internal use
 -- lain.helpers
@@ -86,6 +88,18 @@ end
 
 -- }}}
 
+-- {{{ Pipe operations
+
+-- read the full output of a pipe (command)
+function helpers.read_pipe(cmd)
+   local f = assert(io.popen(cmd))
+   local output = f:read("*all")
+   f:close()
+   return output
+end
+
+-- }}}
+
 -- {{{ A map utility
 
 helpers.map_table = {}
@@ -99,5 +113,24 @@ function helpers.get_map(element)
 end
 
 -- }}}
+
+--{{{ Iterate over table of records sorted by keys
+function helpers.spairs(t)
+    -- collect the keys
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+
+    table.sort(keys)
+
+    -- return the iterator function
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[i] then
+            return keys[i], t[keys[i]]
+        end
+    end
+end
+--}}}
 
 return helpers
