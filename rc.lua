@@ -58,7 +58,6 @@ run_once("xflux -l 48.8566 -g 2.3522")          -- ambiant light Paris
 
 run_once("urxvt")
 run_once("chromium")
-run_once("thunar --daemon")
 -- }}}
 
 -- {{{ Variable definitions
