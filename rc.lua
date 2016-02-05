@@ -239,43 +239,40 @@ mailwidget = lain.widgets.imap({
 batwidget = lain.widgets.bat({
     settings = function()
         bat_header = " Bat "
-        bat_p      = bat_now.perc .. " "
+        bat_p      = bat_now.perc .. "% "
 
         if bat_now.status == "Not present" then
             bat_header = ""
             bat_p      = ""
         end
 
-        widget:set_markup(markup(blue, bat_header) .. bat_p)
+        widget:set_markup(markup(blue, bat_header) .. bat_p .. bat_now.time .. " left")
     end
 })
 
--- -- ALSA volume bar
--- myvolumebar = lain.widgets.alsabar({
---     card   = "0",
---     ticks  = true,
---     width  = 80,
---     height = 10,
---     colors = {
---         background = "#383838",
---         unmute     = "#80CCE6",
---         mute       = "#FF9F9F"
---     },
---     notifications = {
---         font      = "Tamsyn",
---         font_size = "12",
---         bar_size  = 32
---     }
--- })
--- alsamargin = wibox.layout.margin(myvolumebar.bar, 5, 8, 80)
--- wibox.layout.margin.set_top(alsamargin, 12)
--- wibox.layout.margin.set_bottom(alsamargin, 12)
--- volumewidget = wibox.widget.background()
--- volumewidget:set_widget(alsamargin)
--- volumewidget:set_bgimage(beautiful.widget_bg)
-
--- Pulse wiget
-volumewidget = lain.widgets.pulseaudio()
+-- -- PulseAudio volume bar
+myvolumebar = lain.widgets.pulsebar({
+    card   = "0",
+    ticks  = true,
+    width  = 80,
+    height = 10,
+    colors = {
+        background = "#383838",
+        unmute     = "#80CCE6",
+        mute       = "#FF9F9F"
+    },
+    notifications = {
+        font      = "Tamsyn",
+        font_size = "12",
+        bar_size  = 32
+    }
+})
+alsamargin = wibox.layout.margin(myvolumebar.bar, 5, 8, 80)
+wibox.layout.margin.set_top(alsamargin, 12)
+wibox.layout.margin.set_bottom(alsamargin, 12)
+volumewidget = wibox.widget.background()
+volumewidget:set_widget(alsamargin)
+volumewidget:set_bgimage(beautiful.widget_bg)
 
 -- CPU
 -- cpu_widget = lain.widgets.cpu({
@@ -423,7 +420,7 @@ for s = 1, screen.count() do
     -- right_layout:add(musicwidget)
     -- right_layout:add(bar)
     -- right_layout:add(spr_very_small)
-    right_layout:add(spr_left)
+    -- right_layout:add(spr_left)
     right_layout:add(volumewidget)
     right_layout:add(spr_left)
     -- right_layout:add(bottom_bar)
@@ -592,33 +589,33 @@ globalkeys = awful.util.table.join(
     -- Pulse volume control
     awful.key({ altkey }, "Up",
         function ()
-            os.execute(string.format("pactl set-sink-volume %s +1%%", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-volume %s +2%%", myvolumebar.sink))
+            myvolumebar.update()
         end),
     awful.key({ altkey }, "Down",
         function ()
-            os.execute(string.format("pactl set-sink-volume %s -1%%", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-volume %s -2%%", myvolumebar.sink))
+            myvolumebar.update()
         end),
     awful.key({ altkey }, "m",
         function ()
-            os.execute(string.format("pactl set-sink-mute %s toggle", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-mute %s toggle", myvolumebar.sink))
+            myvolumebar.update()
         end),
     awful.key({}, "XF86AudioRaiseVolume",
         function ()
-            os.execute(string.format("pactl set-sink-volume %s +1%%", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-volume %s +2%%", myvolumebar.sink))
+            myvolumebar.update()
         end),
     awful.key({}, "XF86AudioLowerVolume",
         function ()
-            os.execute(string.format("pactl set-sink-volume %s -1%%", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-volume %s -2%%", myvolumebar.sink))
+            myvolumebar.update()
         end),
     awful.key({}, "XF86AudioMute",
         function ()
-            os.execute(string.format("pactl set-sink-mute %s toggle", volumewidget.sink))
-            volumewidget.update()
+            os.execute(string.format("pactl set-sink-mute %s toggle", myvolumebar.sink))
+            myvolumebar.update()
         end),
 
     -- MPD control
