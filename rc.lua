@@ -590,6 +590,7 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey }, "Up",
         function ()
             os.execute(string.format("pactl set-sink-volume %s +2%%", myvolumebar.sink))
+            os.execute(string.format("pactl set-sink-mute %s 0", myvolumebar.sink))
             myvolumebar.update()
         end),
     awful.key({ altkey }, "Down",
@@ -605,6 +606,7 @@ globalkeys = awful.util.table.join(
     awful.key({}, "XF86AudioRaiseVolume",
         function ()
             os.execute(string.format("pactl set-sink-volume %s +2%%", myvolumebar.sink))
+            os.execute(string.format("pactl set-sink-mute %s 0", myvolumebar.sink))
             myvolumebar.update()
         end),
     awful.key({}, "XF86AudioLowerVolume",
